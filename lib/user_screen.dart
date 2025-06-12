@@ -4,11 +4,12 @@ import 'package:flutter_fake_user_package/user_model.dart';
 import 'package:http/http.dart' as http;
 
 class UserScreen extends StatelessWidget {
-  const UserScreen({Key? key}) : super(key: key);
+  final String baseUrl;
+  const UserScreen({Key? key, this.baseUrl = 'https://fakestoreapi.com'})
+      : super(key: key);
 
   Future<List<User>> fetchUsers() async {
-    final response =
-        await http.get(Uri.parse('https://fakestoreapi.com/users'));
+    final response = await http.get(Uri.parse('$baseUrl/users'));
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
       return data.map((json) => User.fromJson(json)).toList();
@@ -20,7 +21,10 @@ class UserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('User List')),
+      appBar: AppBar(
+        title: const Text('User List'),
+        centerTitle: MediaQuery.of(context).size.width <= 600,
+      ),
       body: FutureBuilder<List<User>>(
         future: fetchUsers(),
         builder: (context, snapshot) {
